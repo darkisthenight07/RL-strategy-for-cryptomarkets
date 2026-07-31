@@ -23,8 +23,30 @@ def test_env_creation_and_spaces():
     logger.info(f"Action space: {env.action_space}")
     logger.info(f"Max steps: {env.max_steps}, features: {env.n_features}")
     assert env.action_space.shape == (1,)  # BTC-only for now
-    assert env.action_space.low[0] == 0.0
+    assert env.action_space.low[0] == -1.0
     assert env.action_space.high[0] == 1.0
+    env.close()
+
+def test_obs_is_single_timestep_not_flattened_window():
+    # Regression guard: this branch trains a recurrent (LSTM) policy,
+    # which is expected to carry temporal context across steps in its
+    # own hidden state. The observation must therefore be one timestep
+    # of features (+ portfolio vector), NOT the old MLP-era flattened
+    # `window_len * n_features` window. If someone reintroduces the
+    # flatten, this is the test that should catch it.
+    env = GymBitcoinEnv()
+    portfolio_vec_dim = 3 + env.n_assets
+    expected_obs_dim = env.n_features + portfolio_vec_dim
+    logger.info(
+        f"obs_dim={env.observation_space.shape[0]} "
+        f"(expected {expected_obs_dim} = n_features({env.n_features}) "
+        f"+ portfolio_vec_dim({portfolio_vec_dim}); "
+        f"NOT window_len({env.window_len}) * n_features)"
+    )
+    assert env.observation_space.shape == (expected_obs_dim,)
+
+    obs, _ = env.reset(seed=42)
+    assert obs.shape == (expected_obs_dim,)
     env.close()
 
 def test_reset_contract():
@@ -76,10 +98,22 @@ def test_full_episode_random_policy():
 def test_action_clipping():
     env = GymBitcoinEnv()
     env.reset(seed=1)
-    # Out-of-range action should clip to [0, 1], not error.
+    # Out-of-range action should clip to [-1, 1], not error.
     obs, r, t, tr, info = env.step(np.array([5.0], dtype=np.float32))
-    assert 0.0 <= info["weights"][0] <= 1.0
+    assert -1.0 <= info["weights"][0] <= 1.0
     logger.info(f"Out-of-range action clipped correctly: weights={info['weights']}")
+    env.close()
+
+def test_negative_action_opens_futures_short():
+    env = GymBitcoinEnv()
+    env.reset(seed=2)
+    # Two steps of a full-negative delta to push net weight below zero
+    # (single step is rate-limited to -0.5 * max_step_change territory).
+    env.step(np.array([-1.0], dtype=np.float32))
+    obs, r, t, tr, info = env.step(np.array([-1.0], dtype=np.float32))
+    assert info["weights"][0] < 0.0
+    assert env.portfolio.short_position(env.portfolio.symbols[0]).short_quantity > 0.0
+    assert env.portfolio.long_position(env.portfolio.symbols[0]).quantity == 0.0  # long leg untouched
     env.close()
 
 def test_max_trade_step_rate_limit():
@@ -111,6 +145,7 @@ TESTS = [
     test_full_allocation_buys_btc,
     test_full_episode_random_policy,
     test_action_clipping,
+    test_negative_action_opens_futures_short,
     test_max_trade_step_rate_limit,
     test_reset_clears_portfolio_state,
 ]
