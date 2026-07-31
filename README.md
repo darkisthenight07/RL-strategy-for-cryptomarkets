@@ -1,479 +1,171 @@
 <div align="center">
 
-![Warlock Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0F0524,35:2E1065,70:4C1D95,100:6D28D9&height=240&section=header&text=WARLOCK&fontSize=78&fontColor=F5F3FF&animation=fadeIn&fontAlignY=36&desc=A%20Reinforcement%20Learning%20Framework%20for%20Cryptocurrency%20Trading&descAlignY=56&descSize=17)
+![Warlock Banner](https://capsule-render.vercel.app/api?type=waving&color=0:0B0714,35:1E1B4B,70:4338CA,100:6366F1&height=220&section=header&text=WARLOCK%20%2F%20LSTM-LONG-ONLY&fontSize=40&fontColor=E0E7FF&animation=fadeIn&fontAlignY=38&desc=Experiment%20Log%20%E2%80%94%20Constraining%20the%20Action%20Space%20to%20Fix%20a%20Broken%20Agent&descAlignY=58&descSize=15)
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=21&duration=2800&pause=900&color=C4B5FD&center=true&vCenter=true&width=720&lines=Recurrent+PPO+%2B+LSTM+Trading+Agent;Custom+Gymnasium+Trading+Environment;Sharpe-Aware%2C+Risk-Engineered+Rewards;Config-Driven+%7C+Backtested+%7C+Reproducible" alt="Typing SVG" />
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=17&duration=3000&pause=1000&color=A5B4FC&center=true&vCenter=true&width=780&lines=Branch%3A+ppo-trained-models-lstm-long-only;Action+Space+Restricted+to+%5B0%2C+1%5D+Net+Weight+(No+Shorting);20-Trial+Optuna+Sweep+Logged+%2B+Best+Config+Exported;Status%3A+Experimental+%E2%80%94+Breaker+Rate+Still+Elevated" alt="Typing SVG" />
 
 <br>
 
-[![Python](https://img.shields.io/badge/Python-3.8+-6D28D9?style=for-the-badge&logo=python&logoColor=F5F3FF&labelColor=1a0b2e)](https://www.python.org/)
-[![Stable Baselines3](https://img.shields.io/badge/SB3--Contrib-RecurrentPPO-7C3AED?style=for-the-badge&logo=pytorch&logoColor=F5F3FF&labelColor=1a0b2e)](https://github.com/Stable-Baselines-Team/stable-baselines3-contrib)
-[![Gymnasium](https://img.shields.io/badge/Gymnasium-Custom%20Env-8B5CF6?style=for-the-badge&logo=openaigym&logoColor=F5F3FF&labelColor=1a0b2e)](https://gymnasium.farama.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-A78BFA?style=for-the-badge&labelColor=1a0b2e)](#license)
-
-<a href="https://github.com/darkisthenight07/warlock/stargazers"><img src="https://img.shields.io/github/stars/darkisthenight07/warlock?style=flat-square&color=A78BFA&labelColor=1a0b2e&label=Stars" /></a>
-<a href="https://github.com/darkisthenight07/warlock/commits/main"><img src="https://img.shields.io/github/last-commit/darkisthenight07/warlock?style=flat-square&color=A78BFA&labelColor=1a0b2e&label=Last%20Commit" /></a>
-<img src="https://img.shields.io/badge/Status-Actively%20Developed-A78BFA?style=flat-square&labelColor=1a0b2e" />
-<img src="https://img.shields.io/badge/Domain-Quant%20%2F%20RL%20Research-A78BFA?style=flat-square&labelColor=1a0b2e" />
+[![Python](https://img.shields.io/badge/Python-3.8+-4338CA?style=flat-square&logo=python&logoColor=E0E7FF&labelColor=10102b)](https://www.python.org/)
+[![SB3-Contrib](https://img.shields.io/badge/SB3--Contrib-RecurrentPPO-4F46E5?style=flat-square&logo=pytorch&logoColor=E0E7FF&labelColor=10102b)](https://github.com/Stable-Baselines-Team/stable-baselines3-contrib)
+[![Optuna](https://img.shields.io/badge/Optuna-20%20Trials%20Logged-6366F1?style=flat-square&logoColor=E0E7FF&labelColor=10102b)](https://optuna.org/)
+[![Action Space](https://img.shields.io/badge/Action%20Space-Long--Only-818CF8?style=flat-square&labelColor=10102b)]()
+[![Branch Status](https://img.shields.io/badge/Branch-Experimental-818CF8?style=flat-square&labelColor=10102b)]()
 
 </div>
 
 <br>
 
-<table align="center" width="100%">
-<tr><td>
-
-**Warlock** is a modular Reinforcement Learning framework for developing and evaluating cryptocurrency trading agents. It provides an end-to-end research pipeline — historical market data ingestion, feature engineering, a realistic portfolio simulator, and a custom Gymnasium environment — purpose-built for training and stress-testing sequence-aware RL policies such as **Recurrent PPO with an LSTM** backbone. Every stage is config-driven, meaning the whole experiment surface can be reshaped from a single YAML file without touching core code.
-
-</td></tr>
-</table>
-
-<br>
-
-<div align="center">
-
-### 📚 Table of Contents
-
-[Backtest Snapshot](#-latest-backtest-snapshot) • [Key Features](#-key-features) • [Architecture](#-architecture-overview) • [Repository Structure](#-repository-structure) • [Pipeline](#-the-pipeline) • [Core Modules](#-core-modules) • [Reward Design](#-reward-design) • [Configuration](#-configuration) • [Getting Started](#-getting-started) • [Tech Stack](#-tech-stack) • [Roadmap](#-roadmap) • [Contributing](#-contributing) • [License](#license)
-
-</div>
-
-<br>
+> Like the sibling `lstm-optuna` branch, this is an **experiment log**, not a finished agent. It records a specific hypothesis test — does removing shorting from the action space reduce the reward-hacking/circuit-breaker behaviour seen in earlier runs — along with the actual sweep results, good and bad.
 
 ---
 
-## 📊 Latest Backtest Snapshot
+## 🧪 The Hypothesis Behind This Branch
 
-<div align="center">
+Earlier PPO runs (see the `lstm-optuna` branch) kept tripping the drawdown circuit breaker on effectively every seed, and Sharpe ratios were deeply negative. One suspected contributor: an unrestricted **long/short action space** gives the policy more surface area to exploit the reward function through leveraged or oscillating short positions rather than learning a coherent trading strategy.
 
-<br>
+This branch tests that directly by **constraining the action space to long-only**:
 
-<table>
-<thead>
-<tr>
-<th align="left">Metric</th>
-<th align="center">Weakest Checkpoint</th>
-<th align="center"></th>
-<th align="center">Best Checkpoint <code>(50k steps)</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><b>Sharpe Ratio</b></td>
-<td align="center"><code>-8.18</code></td>
-<td align="center">→</td>
-<td align="center">🟢 <b>0.4033</b></td>
-</tr>
-<tr>
-<td align="left"><b>Total Return</b></td>
-<td align="center"><code>-29.81%</code></td>
-<td align="center">→</td>
-<td align="center">🟢 <b>+3.08%</b></td>
-</tr>
-<tr>
-<td align="left"><b>Profit Factor</b></td>
-<td align="center"><code>0.517</code></td>
-<td align="center">→</td>
-<td align="center">🟢 <b>1.2639</b></td>
-</tr>
-<tr>
-<td align="left"><b>Expectancy</b></td>
-<td align="center"><code>-4.93</code></td>
-<td align="center">→</td>
-<td align="center">🟢 <b>+1.97</b></td>
-</tr>
-</tbody>
-</table>
-
-</div>
-
-<br>
-
-<div align="center">
-
-#### Full Metric Breakdown
-
-<table>
-<thead>
-<tr><th align="left">Category</th><th align="left">Metric</th><th align="center">Value</th></tr>
-</thead>
-<tbody>
-<tr><td rowspan="4" align="left"><b>Returns</b></td><td>Total Return</td><td align="center">🟢 +3.08%</td></tr>
-<tr><td>Annualized Return / CAGR</td><td align="center">🟢 +4.42%</td></tr>
-<tr><td>Annualized Volatility</td><td align="center">12.74%</td></tr>
-<tr><td>Final Capital</td><td align="center">$10,307.61</td></tr>
-<tr><td rowspan="4" align="left"><b>Risk-Adjusted</b></td><td>Sharpe Ratio</td><td align="center">🟢 0.4033</td></tr>
-<tr><td>Sortino Ratio</td><td align="center">0.0061</td></tr>
-<tr><td>Calmar Ratio</td><td align="center">🟢 0.5504</td></tr>
-<tr><td>Peak Capital</td><td align="center">$10,625.75</td></tr>
-<tr><td rowspan="4" align="left"><b>Drawdown</b></td><td>Max Drawdown</td><td align="center">🟢 8.03%</td></tr>
-<tr><td>Average Drawdown</td><td align="center">2.54%</td></tr>
-<tr><td>Longest Drawdown (steps)</td><td align="center">3,205</td></tr>
-<tr><td>Minimum Capital</td><td align="center">$9,316.84</td></tr>
-<tr><td rowspan="5" align="left"><b>Trade Quality</b></td><td>Total Trades</td><td align="center">1,264</td></tr>
-<tr><td>Closing Trades</td><td align="center">533</td></tr>
-<tr><td>Win Rate</td><td align="center">46.72%</td></tr>
-<tr><td>Profit Factor</td><td align="center">🟢 1.2639</td></tr>
-<tr><td>Expectancy</td><td align="center">🟢 +1.97</td></tr>
-</tbody>
-</table>
-
-</div>
-
-
-<br>
-
----
-
-## ✨ Key Features
-
-<table>
-<tr>
-<td width="50%" valign="top">
-
-**Data & Features**
-- 🔄 Modular data pipeline — Binance via `ccxt`, gap-filling, anomaly detection
-- 🧬 Feature engineering across 5 indicator families
-- 📉 Auto-generated diagnostic plots (correlation, Sharpe, distributions)
-
-</td>
-<td width="50%" valign="top">
-
-**Environment & Execution**
-- 🕹️ Custom Gymnasium env for sequence-aware policies
-- 💰 Realistic spot simulator — fees, slippage, min notionals
-- 🛡️ ATR-based SL/TP, dynamic sizing, drawdown protection
-
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-
-**Agent & Training**
-- 🧠 Recurrent PPO (LSTM policy) via `sb3-contrib`
-- 🎯 Optuna-based hyperparameter optimization
-- 🌱 Multi-seed runs for robustness validation
-
-</td>
-<td width="50%" valign="top">
-
-**Reward & Analytics**
-- 📈 Rolling Sharpe-ratio objective with return blending
-- ⚖️ Drawdown and overtrading penalties
-- 📊 VectorBT-powered metrics, leaderboards, reporting
-
-</td>
-</tr>
-</table>
-
-<br>
-
----
-
-## 🏗️ Architecture Overview
-
-```mermaid
-flowchart LR
-    A[("📥 Data Manager")] --> B[["🧬 Feature Engineering"]]
-    B --> C{{"🕹️ Gymnasium Env"}}
-    C --> D[["💰 Portfolio Simulator"]]
-    D --> E(("🧠 Recurrent PPO Agent"))
-    E --> F[["📊 Analytics & Backtesting"]]
-    F -. tune reward/features .-> B
-    F -. tune hyperparameters .-> E
-
-    classDef stage fill:#2E1065,stroke:#A78BFA,stroke-width:1.5px,color:#F5F3FF;
-    classDef agent fill:#5B21B6,stroke:#C4B5FD,stroke-width:2px,color:#F5F3FF;
-    class A,B,C,D,F stage;
-    class E agent;
+```python
+# src/env/gym_bitcoin.py
+# Long-only: net weight per asset stays in [0, 1] (no short leg).
+self.action_space = spaces.Box(...)
 ```
 
-<br>
+The agent can now only ever hold between 0% and 100% net long exposure — no shorting, no leverage past 1x. Everything else (reward shaping, Optuna search harness, portfolio simulator) carries over from the other branch.
 
 ---
 
-## 🗂️ Repository Structure
+## 📊 Multi-Seed / Ablation Sweep Results (`experiments/multi_seed/*.json`)
 
-```text
-warlock/
-├── main.py                     # Runs the data + feature pipeline end-to-end
-├── config.yaml                 # Single source of truth for the entire system
-├── requirements.txt
-│
+These are hand-labelled reward-config experiments run before and alongside the formal Optuna sweep, each evaluated on a full backtest (not just eval-episode reward). **`breaker_hit`** means the drawdown circuit breaker fired during that run.
+
+| Config | Sharpe | Total Return | Max DD | Breaker Hit | Trades | Win Rate | Notes |
+|---|---|---|---|---|---|---|---|
+| **`quick_check`** | **-1.10** | -20.8% | 31.1% | **No** | 1,550 | 39.3% | **Best result on this branch — only config where the breaker never fired** |
+| `longer_train` | -3.62 | -38.1% | 41.2% | Yes | 941 | 38.7% | Same overrides as `quick_check`, longer training — regressed |
+| `simple_reward` | -3.46 | -38.1% | 41.1% | Yes | 903 | 34.5% | Dropping the Sharpe term entirely didn't help |
+| `pure_return_strong_dd` | -5.74 | -49.8% | 50.1% | Yes | 2,965 | 40.8% | Strong DD penalty alone isn't sufficient |
+| `strong_dd_penalty` | -6.09 | -49.9% | 50.1% | Yes | 2,219 | 36.8% | Even stronger DD penalty made it worse, not better |
+| `optuna_trial_0000–0004` | -3.86 | -30.2% | 30.3% | Yes | 2,134 | 39.8% | Early Optuna trials, all converged to the same point (search space too narrow at this stage) |
+
+**Reading of the data:** long-only constraint alone did not fix the breaker problem — most configurations still hit it on effectively every seed. The one exception, `quick_check`, is the current best-known configuration on this branch: it's the only run where the drawdown circuit breaker never triggered, and it has the least-negative Sharpe ratio (-1.10) of anything recorded here. Notably, simply training that same config for longer (`longer_train`) made results worse, suggesting overfitting to reward-hacking behaviour with extended training time is still a live risk even long-only.
+
+---
+
+## 🔎 Optuna Sweep Summary
+
+A formal Optuna study (`experiments/optuna_warlock_fix_breaker_unknown.db`) was run against this branch's environment:
+
+| | |
+|---|---|
+| Trials logged | 20 (18 complete, 2 running at time of export) |
+| Best objective observed | **-10.57** (up from -10.86 at trial 0) |
+| Objective | `median(Sharpe) − λ·breaker_rate − μ·std(Sharpe)` across seeds |
+
+The best-performing configuration was exported to `experiments/best_config_warlock_fix_breaker_unknown.yaml`:
+
+| Parameter | Best Value |
+|---|---|
+| `ppo.learning_rate` | 0.000213 |
+| `ppo.gamma` | 0.9740 |
+| `ppo.gae_lambda` | 0.9716 |
+| `ppo.clip_range` | 0.1038 |
+| `ppo.ent_coef` | 0.000866 |
+| `ppo.vf_coef` | 0.4875 |
+| `ppo.n_steps` / `batch_size` | 512 / 32 |
+| `env.max_drawdown` | 0.4075 |
+| `env.max_trade_step` | 0.0558 |
+| `reward.drawdown_penalty_scale` | 0.3181 |
+| `reward.sharpe_weight` | 0.1690 |
+| `reward.sharpe_aggregation_steps` | 6 |
+| `reward.step_return_weight` | 1.9399 |
+| `reward.overtrade_penalty_scale` | 0.0549 |
+
+The objective value only moved modestly across the whole 20-trial sweep (-10.86 → -10.57), which is itself a finding: this search space, on the long-only environment, hadn't yet located a configuration that clears the reward-hacking problem outright. `quick_check`'s hand-picked overrides currently outperform anything the sweep found, which is the open question this branch leaves for the next iteration.
+
+### Static baselines for reference (`benchmarks/comparison.md`, same environment)
+
+| Strategy | Total Return | Sharpe | Max Drawdown | Trades | Win Rate |
+|---|---|---|---|---|---|
+| Buy & Hold | -26.16% | -3.20 | 30.22% | 637 | 28.4% |
+| Always Cash | 0.00% | 0.00 | 0.00% | 0 | — |
+| Random Agent | -29.98% | -5.98 | 30.00% | 2,356 | 0.0% |
+
+`quick_check`'s -1.10 Sharpe is the best number on this branch across any comparison point, trained or baseline — but total return (-20.8%) is still well short of `always_cash`, so "best so far" and "good" are not yet the same thing here.
+
+---
+
+## 🗂️ Branch-Relevant Structure
+
+```
+WARLOCK-ppo-trained-models-lstm-long-only/
 ├── src/
-│   ├── data_manager/            → downloading, cleaning, anomaly detection
-│   ├── features/                → indicator pipeline + feature plots
-│   ├── env/                     → Gymnasium env, reward engineering
-│   ├── portfolio/                → order execution, sizing, trade/equity history
-│   ├── agent/                    → PPO trainer, HPO, multi-seed, evaluation
-│   ├── analytics/                → checkpoint evaluation, leaderboards, reports
-│   ├── benchmark/                → buy & hold / random-agent baselines
-│   ├── utils/                    → config loader, seeding, path helpers
-│   └── tests/                    → env, portfolio & reward verification suite
-│
-├── experiments/                 → per-run configs, checkpoints, logs
-├── graphs/features/              → auto-generated feature diagnostic plots
-└── notebooks/                    → exploratory analysis
+│   ├── agent/                   # PPO/RecurrentPPO trainer + hpo_optuna.py
+│   ├── env/
+│   │   └── gym_bitcoin.py        # long-only action space change lives here
+│   ├── portfolio/                 # fee/slippage/SL-TP simulator
+│   └── tests/
+├── experiments/
+│   ├── multi_seed/                 # hand-labelled ablation configs (this README's data)
+│   ├── ppo_baseline/                # raw per-run training dirs
+│   ├── best_config_warlock_fix_breaker_unknown.yaml
+│   ├── optuna_warlock_fix_breaker_unknown.db
+│   └── optuna_futures.journal
+├── benchmarks/                     # buy_hold, always_cash, random_agent + comparison.{csv,json,md}
+├── df.py                           # ad-hoc analysis / dataframe scratch script
+└── config.yaml
 ```
 
-<br>
-
 ---
 
-## 🔁 The Pipeline
-
-<div align="center">
-
-| Stage | Module | What Happens |
-|:--|:--|:--|
-| **1 · Ingest** | `data_manager` | Historical OHLCV pulled from Binance, cleaned, gap-filled, flagged for wick anomalies |
-| **2 · Engineer** | `features` | Price, candle, momentum, volatility & volume features computed + plotted |
-| **3 · Simulate** | `env` + `portfolio` | Custom Gym env wraps a realistic execution simulator (fees, slippage, ATR SL/TP) |
-| **4 · Train** | `agent` | Recurrent PPO (LSTM) trained against the risk-aware reward signal |
-| **5 · Evaluate** | `analytics` | Checkpoints scored, ranked on a leaderboard, and reported via VectorBT metrics |
-| **6 · Iterate** | `agent.hpo` | Optuna sweeps hyperparameters and reward weights against evaluation results |
-
-</div>
-
-<br>
-
----
-
-## 📦 Core Modules
-
-<details>
-<summary><b>1 · Data Management</b> — <code>src/data_manager/</code></summary>
-<br>
-
-- **Downloader & Cleaner** — automates historical OHLCV downloads from exchanges (e.g. Binance), with duplicate removal and missing-candle handling.
-- **Anomaly Detection** — flags structural anomalies such as extreme wick deviations using rolling windows and configurable wick multipliers.
-
-</details>
-
-<details>
-<summary><b>2 · Feature Engineering Suite</b> — <code>src/features/</code></summary>
-<br>
-
-- Builds distinct features across **Price Action, Candlestick, Momentum, Volatility, and Volume** categories.
-- Automated feature profiling generates diagnostic plots in `graphs/features/` — correlation profiles, rolling Sharpe ratios, trend strength, and distribution histograms.
-
-</details>
-
-<details>
-<summary><b>3 · Custom Gymnasium Environment</b> — <code>src/env/</code></summary>
-<br>
-
-- `gym_bitcoin.py` implements a custom Gymnasium interface that streams price tensors and historical lookback windows into standard RL networks — including recurrent (LSTM) policies.
-
-</details>
-
-<details>
-<summary><b>4 · Advanced Portfolio Simulator</b> — <code>src/portfolio/</code></summary>
-<br>
-
-- Emulates realistic spot trading: configurable maker/taker fees, slippage models, minimum trade notional limits, and rebalancing.
-- Includes ATR-based Stop Loss / Take Profit, dynamic position sizing, and portfolio-level drawdown protection.
-- Maintains a full trade and equity history per episode for post-hoc analysis.
-
-</details>
-
-<details>
-<summary><b>5 · Reward Engineering</b> — <code>src/env/rewards.py</code></summary>
-<br>
-
-- Risk-aware reward combining immediate portfolio returns with a **rolling, aggregated Sharpe-ratio objective**.
-- Returns are aggregated over a short window before entering the Sharpe buffer, so the ratio reflects sustained performance rather than single-tick noise.
-- Additional drawdown and overtrading penalties discourage churn and excessive risk-taking in favor of stable, risk-adjusted behavior.
-
-</details>
-
-<details>
-<summary><b>6 · Agent & Experimentation</b> — <code>src/agent/</code></summary>
-<br>
-
-- `trainer.py` — orchestrates Recurrent PPO training (`sb3-contrib`), environment vectorization, and callbacks.
-- `hpo.py` — Optuna-based hyperparameter optimization.
-- `multi_seed.py` — multi-seed runs for robustness checks.
-- `evaluate.py` / `quick_eval.py` — checkpoint evaluation utilities.
-- `experiment.py` — experiment tracking and run-directory management (see `experiments/`).
-
-</details>
-
-<details>
-<summary><b>7 · Analytics & Reporting</b> — <code>src/analytics/</code></summary>
-<br>
-
-- Checkpoint evaluation, leaderboard generation, and cross-run comparison.
-- `vbt_metrics.py` — VectorBT-powered performance metrics (Sharpe, returns, profit factor, expectancy).
-- Report and plot generation for backtest results.
-
-</details>
-
-<br>
-
----
-
-## 🧮 Reward Design
-
-The reward function blends four signals into a single risk-adjusted scalar:
-
-$$R_t = w_r \cdot r_t \;+\; w_s \cdot \text{Sharpe}_t \;-\; \lambda_{dd} \cdot \text{Drawdown}_t \;-\; \lambda_{ot} \cdot \text{Overtrade}_t$$
-
-<div align="center">
-
-| Term | Purpose |
-|:--|:--|
-| `step_return_weight · r_t` | Rewards immediate, realized portfolio return |
-| `sharpe_weight · Sharpe_t` | Rewards *consistency* of returns over a rolling, aggregated window |
-| `drawdown_penalty_scale` | Penalizes portfolio-level drawdown beyond safe thresholds |
-| `overtrade_penalty_scale` | Penalizes excessive turnover / churn |
-
-</div>
-
-All four weights, plus the Sharpe window length and aggregation step size, are exposed directly in `config.yaml` under `reward:` — enabling systematic HPO sweeps over reward shape itself, not just network hyperparameters.
-
-<br>
-
----
-
-## ⚙️ Configuration
-
-Every module is fully decentralized and governed by a single `config.yaml`. This lets you instantly:
-
-- Swap exchange, symbol, and timeframe settings
-- Toggle active technical indicators
-- Tune trading fees, slippage, and leverage (spot & short)
-- Configure lookback/observation windows
-- Adjust risk parameters (ATR-based SL/TP, max drawdown)
-- Reshape the reward function without touching core code
-
-<details>
-<summary><b>Example config snippet</b></summary>
-
-```yaml
-env:
-  action_scale: 0.5
-  window_len: 48
-  max_trade_step: 0.2
-  transaction_cost_rate: 0.0005
-  max_drawdown: 0.3
-  initial_capital: 10000.0
-
-risk:
-  stop_loss_atr_multiple: 1.5
-  take_profit_atr_multiple: 3.0
-  target_atr_pct: 1.0
-```
-
-</details>
-
-<br>
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Python 3.8+
-- `TA-Lib` C-library dependencies (required for technical indicators)
-
-### 1 · Installation
+## ▶️ Reproducing the Best-Known Run
 
 ```bash
-# Clone the repository
-git clone https://github.com/darkisthenight07/warlock
-cd warlock
+# Train using the currently best hand-picked config (breaker never fired)
+python main.py --overrides \
+    env.max_drawdown=0.4 \
+    ppo.ent_coef=0.005 \
+    ppo.learning_rate=0.0001 \
+    ppo.n_steps=512 \
+    reward.drawdown_penalty_scale=0.3 \
+    reward.sharpe_aggregation_steps=24 \
+    reward.sharpe_weight=0.05
 
-# Create and activate a virtual environment
-python -m venv venv
-venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
+# Or resume/extend the Optuna study that produced best_config_warlock_fix_breaker_unknown.yaml
+python -m src.agent.hpo_optuna \
+    --study-name warlock_fix_breaker_unknown \
+    --storage sqlite:///experiments/optuna_warlock_fix_breaker_unknown.db \
+    --n-trials 20 \
+    --search-space core+env
 ```
 
-### 2 · Run the Data & Feature Pipeline
-
-Downloads data, builds clean feature matrices, and generates diagnostic charts in `graphs/`:
+Component sanity checks:
 
 ```bash
-python main.py
-```
-
-### 3 · Train the Agent
-
-```bash
-python -m src.agent.train
-```
-
-### 4 · Component Verification Tests
-
-```bash
-# Verify reward scaling, buffer mechanics, and penalties
 python -m src.tests.test_rewards
-
-# Verify trade execution, fee charges, slippage, and liquidations
 python -m src.tests.test_portfolio
-
-# Verify Gymnasium state handling, lookback observations, step updates, and resets
 python -m src.tests.test_env
 ```
 
-<br>
-
 ---
 
-## 🧠 Tech Stack
+## 📝 Status & Next Steps
+
+- [x] Long-only action space implemented and validated
+- [x] Ablation sweep run across 10 hand-picked reward/env configurations
+- [x] Found one config (`quick_check`) where the drawdown breaker never fires
+- [x] Formal 20-trial Optuna sweep completed, best config exported to YAML
+- [ ] Understand why `longer_train` (same config, more steps) regressed — overfitting vs. instability
+- [ ] Re-run Optuna with a search space anchored closer to `quick_check`'s overrides
+- [ ] Get total return positive, or at minimum ahead of `always_cash`, on a held-out backtest
+
+As with the other branch, every number above is a mid-experiment reading. `quick_check` is the current best lead, not a result to ship.
+
+<br>
 
 <div align="center">
 
-![Python](https://img.shields.io/badge/Python-1a0b2e?style=for-the-badge&logo=python&logoColor=A78BFA)
-![PyTorch](https://img.shields.io/badge/PyTorch-1a0b2e?style=for-the-badge&logo=pytorch&logoColor=A78BFA)
-![Gymnasium](https://img.shields.io/badge/Gymnasium-1a0b2e?style=for-the-badge&logo=openaigym&logoColor=A78BFA)
-![Stable Baselines3](https://img.shields.io/badge/SB3--Contrib-1a0b2e?style=for-the-badge&logoColor=A78BFA)
-![Optuna](https://img.shields.io/badge/Optuna-1a0b2e?style=for-the-badge&logoColor=A78BFA)
-
-![Pandas](https://img.shields.io/badge/Pandas-1a0b2e?style=for-the-badge&logo=pandas&logoColor=A78BFA)
-![NumPy](https://img.shields.io/badge/NumPy-1a0b2e?style=for-the-badge&logo=numpy&logoColor=A78BFA)
-![TA--Lib](https://img.shields.io/badge/TA--Lib-1a0b2e?style=for-the-badge&logoColor=A78BFA)
-![VectorBT](https://img.shields.io/badge/VectorBT-1a0b2e?style=for-the-badge&logoColor=A78BFA)
-![ccxt](https://img.shields.io/badge/ccxt-1a0b2e?style=for-the-badge&logoColor=A78BFA)
-![Matplotlib](https://img.shields.io/badge/Matplotlib-1a0b2e?style=for-the-badge&logo=python&logoColor=A78BFA)
-![Loguru](https://img.shields.io/badge/Loguru-1a0b2e?style=for-the-badge&logoColor=A78BFA)
-
-</div>
-
-<br>
-
----
-
-## 🗺️ Roadmap
-
-- [ ] Expand to multi-asset portfolios (`ETH/USDT` and beyond)
-- [ ] Live / paper-trading execution bridge
-- [ ] Extended HPO sweeps across reward-shaping variants
-- [ ] Model export & inference API for trained checkpoints
-- [ ] Walk-forward validation harness for out-of-sample robustness
-
-<br>
-
----
-
-
-## License
-
-Distributed under the **MIT License**.
-
-<br>
-
----
-
-<div align="center">
-
-*"An edge isn't found — it's engineered, back-tested, and earned one Sharpe ratio at a time."*
-
-<br>
-
-![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:6D28D9,35:4C1D95,70:2E1065,100:0F0524&height=140&section=footer)
+![Footer](https://capsule-render.vercel.app/api?type=waving&color=0:6366F1,50:4338CA,100:0B0714&height=100&section=footer)
 
 </div>
