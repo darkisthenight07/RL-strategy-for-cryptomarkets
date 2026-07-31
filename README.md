@@ -1,12 +1,12 @@
-# Warlock — `mlp-long-only`
+# Warlock — `lstm-long-only`
 
 ## Motive
 
-`main` uses a recurrent (LSTM) policy, which carries temporal context across steps in its own hidden state. This branch tests whether that recurrence is actually necessary, by swapping in a plain feedforward (MLP) policy and combining it with a long-only action space — isolating two variables at once: does removing the LSTM hurt performance, and does removing shorting reduce the reward-hacking/circuit-breaker behaviour seen on `main`.
+`main` trains a recurrent (LSTM) PPO policy with an unrestricted long/short action space. Earlier long/short runs showed deeply negative Sharpe ratios and frequently tripped the drawdown circuit breaker. The hypothesis tested on this branch: an unrestricted action space gives the policy too much surface area to exploit the reward function (e.g. leveraged or oscillating short positions) instead of learning a coherent strategy. This branch removes shorting to test whether constraining the action space reduces that reward-hacking behaviour.
 
 ## Difference from `main`
 
-- **Policy:** `MlpPolicy` (non-recurrent, feedforward), instead of `main`'s `MlpLstmPolicy`. No hidden state carried across steps.
-- **Action space:** net position weight is clamped to `[0.0, 1.0]` (long-only, no short leg), instead of `main`'s `[-1.0, 1.0]`.
+- **Policy:** same as `main` — `MlpLstmPolicy` (recurrent PPO, LSTM-based).
+- **Action space:** net position weight is clamped to `[0.0, 1.0]` (long-only, no short leg, no leverage past 1x), instead of `main`'s `[-1.0, 1.0]`.
 - **Assets:** single-asset (BTC/USDT), same as `main`.
-- Reward shaping and portfolio simulator are otherwise unchanged from `main`.
+- Reward shaping, portfolio simulator, and Optuna search harness are otherwise unchanged from `main`.
