@@ -32,7 +32,7 @@
 
 <div align="center">
 
-### 📚 Table of Contents
+### Table of Contents
 
 [Backtest Snapshot](#-latest-backtest-snapshot) • [Key Features](#-key-features) • [Architecture](#-architecture-overview) • [Repository Structure](#-repository-structure) • [Pipeline](#-the-pipeline) • [Core Modules](#-core-modules) • [Reward Design](#-reward-design) • [Configuration](#-configuration) • [Getting Started](#-getting-started) • [Tech Stack](#-tech-stack) • [Roadmap](#-roadmap) • [Contributing](#-contributing) • [License](#license)
 
@@ -42,7 +42,7 @@
 
 ---
 
-## 📊 Latest Backtest Snapshot
+## Latest Backtest Snapshot
 
 <div align="center">
 
@@ -54,7 +54,7 @@
 <th align="left">Metric</th>
 <th align="center">Weakest Checkpoint</th>
 <th align="center"></th>
-<th align="center">Best Checkpoint <code>(50k steps)</code></th>
+<th align="center">Best Checkpoint</th>
 </tr>
 </thead>
 <tbody>
@@ -62,25 +62,25 @@
 <td align="left"><b>Sharpe Ratio</b></td>
 <td align="center"><code>-8.18</code></td>
 <td align="center">→</td>
-<td align="center">🟢 <b>0.4033</b></td>
+<td align="center"> <b>0.4033</b></td>
 </tr>
 <tr>
 <td align="left"><b>Total Return</b></td>
 <td align="center"><code>-29.81%</code></td>
 <td align="center">→</td>
-<td align="center">🟢 <b>+3.08%</b></td>
+<td align="center"> <b>+3.08%</b></td>
 </tr>
 <tr>
 <td align="left"><b>Profit Factor</b></td>
 <td align="center"><code>0.517</code></td>
 <td align="center">→</td>
-<td align="center">🟢 <b>1.2639</b></td>
+<td align="center"> <b>1.2639</b></td>
 </tr>
 <tr>
 <td align="left"><b>Expectancy</b></td>
 <td align="center"><code>-4.93</code></td>
 <td align="center">→</td>
-<td align="center">🟢 <b>+1.97</b></td>
+<td align="center"> <b>+1.97</b></td>
 </tr>
 </tbody>
 </table>
@@ -98,23 +98,23 @@
 <tr><th align="left">Category</th><th align="left">Metric</th><th align="center">Value</th></tr>
 </thead>
 <tbody>
-<tr><td rowspan="4" align="left"><b>Returns</b></td><td>Total Return</td><td align="center">🟢 +3.08%</td></tr>
-<tr><td>Annualized Return / CAGR</td><td align="center">🟢 +4.42%</td></tr>
+<tr><td rowspan="4" align="left"><b>Returns</b></td><td>Total Return</td><td align="center"> +3.08%</td></tr>
+<tr><td>Annualized Return / CAGR</td><td align="center"> +4.42%</td></tr>
 <tr><td>Annualized Volatility</td><td align="center">12.74%</td></tr>
 <tr><td>Final Capital</td><td align="center">$10,307.61</td></tr>
-<tr><td rowspan="4" align="left"><b>Risk-Adjusted</b></td><td>Sharpe Ratio</td><td align="center">🟢 0.4033</td></tr>
+<tr><td rowspan="4" align="left"><b>Risk-Adjusted</b></td><td>Sharpe Ratio</td><td align="center"> 0.4033</td></tr>
 <tr><td>Sortino Ratio</td><td align="center">0.0061</td></tr>
-<tr><td>Calmar Ratio</td><td align="center">🟢 0.5504</td></tr>
+<tr><td>Calmar Ratio</td><td align="center"> 0.5504</td></tr>
 <tr><td>Peak Capital</td><td align="center">$10,625.75</td></tr>
-<tr><td rowspan="4" align="left"><b>Drawdown</b></td><td>Max Drawdown</td><td align="center">🟢 8.03%</td></tr>
+<tr><td rowspan="4" align="left"><b>Drawdown</b></td><td>Max Drawdown</td><td align="center"> 8.03%</td></tr>
 <tr><td>Average Drawdown</td><td align="center">2.54%</td></tr>
 <tr><td>Longest Drawdown (steps)</td><td align="center">3,205</td></tr>
 <tr><td>Minimum Capital</td><td align="center">$9,316.84</td></tr>
 <tr><td rowspan="5" align="left"><b>Trade Quality</b></td><td>Total Trades</td><td align="center">1,264</td></tr>
 <tr><td>Closing Trades</td><td align="center">533</td></tr>
 <tr><td>Win Rate</td><td align="center">46.72%</td></tr>
-<tr><td>Profit Factor</td><td align="center">🟢 1.2639</td></tr>
-<tr><td>Expectancy</td><td align="center">🟢 +1.97</td></tr>
+<tr><td>Profit Factor</td><td align="center"> 1.2639</td></tr>
+<tr><td>Expectancy</td><td align="center"> +1.97</td></tr>
 </tbody>
 </table>
 
@@ -125,24 +125,24 @@
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
 **Data & Features**
-- 🔄 Modular data pipeline — Binance via `ccxt`, gap-filling, anomaly detection
-- 🧬 Feature engineering across 5 indicator families
-- 📉 Auto-generated diagnostic plots (correlation, Sharpe, distributions)
+-  Modular data pipeline — Binance via `ccxt`, gap-filling, anomaly detection
+-  Feature engineering across 5 indicator families
+-  Auto-generated diagnostic plots (correlation, Sharpe, distributions)
 
 </td>
 <td width="50%" valign="top">
 
 **Environment & Execution**
-- 🕹️ Custom Gymnasium env for sequence-aware policies
-- 💰 Realistic spot simulator — fees, slippage, min notionals
-- 🛡️ ATR-based SL/TP, dynamic sizing, drawdown protection
+-  Custom Gymnasium env for sequence-aware policies
+-  Realistic spot simulator — fees, slippage, min notionals
+-  ATR-based SL/TP, dynamic sizing, drawdown protection
 
 </td>
 </tr>
@@ -150,17 +150,17 @@
 <td width="50%" valign="top">
 
 **Agent & Training**
-- 🧠 Recurrent PPO (LSTM policy) via `sb3-contrib`
-- 🎯 Optuna-based hyperparameter optimization
-- 🌱 Multi-seed runs for robustness validation
+-  Recurrent PPO (LSTM policy) via `sb3-contrib`
+-  Optuna-based hyperparameter optimization
+-  Multi-seed runs for robustness validation
 
 </td>
 <td width="50%" valign="top">
 
 **Reward & Analytics**
-- 📈 Rolling Sharpe-ratio objective with return blending
-- ⚖️ Drawdown and overtrading penalties
-- 📊 VectorBT-powered metrics, leaderboards, reporting
+-  Rolling Sharpe-ratio objective with return blending
+-  Drawdown and overtrading penalties
+-  VectorBT-powered metrics, leaderboards, reporting
 
 </td>
 </tr>
@@ -170,15 +170,15 @@
 
 ---
 
-## 🏗️ Architecture Overview
+##  Architecture Overview
 
 ```mermaid
 flowchart LR
-    A[("📥 Data Manager")] --> B[["🧬 Feature Engineering"]]
-    B --> C{{"🕹️ Gymnasium Env"}}
-    C --> D[["💰 Portfolio Simulator"]]
-    D --> E(("🧠 Recurrent PPO Agent"))
-    E --> F[["📊 Analytics & Backtesting"]]
+    A[(" Data Manager")] --> B[[" Feature Engineering"]]
+    B --> C{{" Gymnasium Env"}}
+    C --> D[[" Portfolio Simulator"]]
+    D --> E((" Recurrent PPO Agent"))
+    E --> F[[" Analytics & Backtesting"]]
     F -. tune reward/features .-> B
     F -. tune hyperparameters .-> E
 
@@ -192,7 +192,7 @@ flowchart LR
 
 ---
 
-## 🗂️ Repository Structure
+##  Repository Structure
 
 ```text
 warlock/
@@ -201,26 +201,33 @@ warlock/
 ├── requirements.txt
 │
 ├── src/
-│   ├── data_manager/            → downloading, cleaning, anomaly detection
-│   ├── features/                → indicator pipeline + feature plots
-│   ├── env/                     → Gymnasium env, reward engineering
-│   ├── portfolio/                → order execution, sizing, trade/equity history
-│   ├── agent/                    → PPO trainer, HPO, multi-seed, evaluation
-│   ├── analytics/                → checkpoint evaluation, leaderboards, reports
-│   ├── benchmark/                → buy & hold / random-agent baselines
-│   ├── utils/                    → config loader, seeding, path helpers
-│   └── tests/                    → env, portfolio & reward verification suite
+│   ├── data_manager/           → downloading, cleaning, anomaly detection
+│   ├── features/               → indicator pipeline + feature plots
+│   ├── env/                    → Gymnasium env, reward engineering
+│   ├── portfolio/              → order execution, sizing, trade/equity history
+│   ├── agent/                  → PPO trainer, HPO, multi-seed, evaluation
+│   ├── analytics/              → checkpoint evaluation, leaderboards, reports
+│   ├── benchmark/              → buy & hold / random-agent baselines
+│   ├── utils/                  → config loader, seeding, path helpers
+│   └── tests/                  → env, portfolio & reward verification suite
 │
-├── experiments/                 → per-run configs, checkpoints, logs
-├── graphs/features/              → auto-generated feature diagnostic plots
-└── notebooks/                    → exploratory analysis
+├── experiments/                → per-run configs, checkpoints, logs
+├── graphs/features/            → auto-generated feature diagnostic plots
+├── notebooks/                  → exploratory analysis
+│
+├── docs/
+│   └── OPTUNA_HPO.md           → Hyperparameter optimization methodology, search space, pruning strategy, and experiment 
+│
+└── scripts/
+    ├── launch_optuna.ps1       → PowerShell launcher for Optuna HPO experiments 
+    └── launch_optuna.sh        → Bash launcher for Optuna HPO experiments 
 ```
 
 <br>
 
 ---
 
-## 🔁 The Pipeline
+##  The Pipeline
 
 <div align="center">
 
@@ -239,7 +246,7 @@ warlock/
 
 ---
 
-## 📦 Core Modules
+##  Core Modules
 
 <details>
 <summary><b>1 · Data Management</b> — <code>src/data_manager/</code></summary>
@@ -313,7 +320,7 @@ warlock/
 
 ---
 
-## 🧮 Reward Design
+##  Reward Design
 
 The reward function blends four signals into a single risk-adjusted scalar:
 
@@ -336,7 +343,7 @@ All four weights, plus the Sharpe window length and aggregation step size, are e
 
 ---
 
-## ⚙️ Configuration
+##  Configuration
 
 Every module is fully decentralized and governed by a single `config.yaml`. This lets you instantly:
 
@@ -371,7 +378,7 @@ risk:
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Python 3.8+
@@ -423,7 +430,7 @@ python -m src.tests.test_env
 
 ---
 
-## 🧠 Tech Stack
+##  Tech Stack
 
 <div align="center">
 
@@ -447,7 +454,7 @@ python -m src.tests.test_env
 
 ---
 
-## 🗺️ Roadmap
+##  Roadmap
 
 - [ ] Expand to multi-asset portfolios (`ETH/USDT` and beyond)
 - [ ] Live / paper-trading execution bridge
