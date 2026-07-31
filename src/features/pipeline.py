@@ -64,6 +64,8 @@ def apply_train_stats(train: pd.DataFrame, test: pd.DataFrame) -> tuple[pd.DataF
 
     return train, test
 
+
+
 def generate_and_plot_features(symbol: str = "BTC/USDT",
                     timeframe: str = "1h",
                     processed_dir: str = config['paths']['processed_dir'],
@@ -95,8 +97,12 @@ def generate_and_plot_features(symbol: str = "BTC/USDT",
     plot_features(df)
 
     train_df, test_df = split_temporal(df, train_years=4, train_months=5, test_months=6)
+    
+    
 
     train_df, test_df = apply_train_stats(train_df, test_df)
+    train_df = train_df.dropna().reset_index(drop=True)
+    test_df = test_df.dropna().reset_index(drop=True) 
 
     out_path = Path(root(out_dir))
     out_path.mkdir(parents=True, exist_ok=True)
