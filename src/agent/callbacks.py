@@ -273,7 +273,7 @@ class CallbackFactory:
             save_path=str(self._experiment.checkpoints_directory),
             name_prefix="checkpoint",
             save_replay_buffer=False,
-            save_vecnormalize=True,
+            save_vecnormalize=False,
         )
 
         evaluation_callback = EvalCallback(

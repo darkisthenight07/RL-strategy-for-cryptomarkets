@@ -3,11 +3,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-
 import pandas as pd
 from loguru import logger
-from sb3_contrib import RecurrentPPO
-from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
+from stable_baselines3 import PPO
 
 from src.analytics.vbt_metrics import VectorBTMetricsCalculator
 from src.analytics.plots import PlotGenerator
@@ -24,24 +22,21 @@ class Evaluator:
     def __init__(
         self,
         experiment_directory: str | Path,
-        model_path: str | Path | None = None,
-        vecnormalize_path: str | Path | None = None,
-
     ) -> None:
-        self._experiment_directory = Path(experiment_directory)
-        if model_path is not None:
-            self._model_path = Path(model_path)
-        else:
-            best_model = self._experiment_directory / "best_model.zip"
-            final_model = self._experiment_directory / "model.zip"
-            if best_model.exists():
-                self._model_path = best_model
-            elif final_model.exists():
-                self._model_path = final_model
-            else:
-                raise FileNotFoundError(
-                    f"No model found in {self._experiment_directory}"
-                )
+
+        self._experiment_dir = Path(experiment_directory)
+
+        if not self._experiment_dir.exists():
+            raise FileNotFoundError(
+                f"Experiment directory not found: {self._experiment_dir}"
+            )
+
+        self._model_path = self._experiment_dir / "model.zip"
+
+        if not self._model_path.exists():
+            raise FileNotFoundError(
+                f"Model not found: {self._model_path}"
+            )
 
         self._evaluation_cfg = config["evaluation"]
         self._training_cfg = config["training"]
@@ -58,55 +53,23 @@ class Evaluator:
             self._model_path,
         )
 
-        self._model = RecurrentPPO.load(
+        self._model = PPO.load(
             self._model_path,
             device=self._training_cfg["device"],
         )
 
         logger.success("Model loaded successfully.")
 
-        test_data = root("data", "features", "test.parquet")
-
-        base_env = DummyVecEnv(
-    [
-        lambda: GymBitcoinEnv(
-            data_path=str(test_data),
-            deterministic_start=True,
-        )
-    ]
+        test_data = (
+            root("data", "features", "test.parquet")
 )
 
-        checkpoint_dir = self._experiment_directory / "checkpoints"
-
-        if vecnormalize_path is not None:
-            vecnormalize_path = Path(vecnormalize_path)
-        else:
-            checkpoint_dir = self._experiment_directory / "checkpoints"
-            vecnormalize_files = sorted(
-        checkpoint_dir.glob("checkpoint_vecnormalize_*_steps.pkl")
-    )
-            if not vecnormalize_files:
-                raise FileNotFoundError(
-                    f"No VecNormalize checkpoint found in {checkpoint_dir}"
-                )
-            vecnormalize_path = vecnormalize_files[-1]
-
-
-
-        logger.info(
-    "Loading VecNormalize statistics from {}",
-    vecnormalize_path,
+        self._environment = GymBitcoinEnv(
+    data_path=str(test_data),
+    deterministic_start=True,
 )
-
-        self._environment = VecNormalize.load(
-    str(vecnormalize_path),
-    base_env,
-)
-
-        self._environment.training = False
-        self._environment.norm_reward = False
         self._evaluation_dir = (
-            self._experiment_directory / "evaluation"
+            self._experiment_dir / "evaluation"
         )
 
         self._plots_dir = (
@@ -167,31 +130,23 @@ class Evaluator:
         # randomness in this env (see gym_bitcoin.py), but we pass an
         # explicit seed too as defense-in-depth in case a stochastic
         # element (e.g. slippage noise) is ever added later.
-        observation = self._environment.reset()
-        lstm_state = None
-        episode_start = True
+        observation, _ = self._environment.reset(
+            seed=self._evaluation_cfg.get("seed", 42)
+        )
 
         terminated = False
         truncated = False
 
         while not (terminated or truncated):
 
-            action, lstm_state = self._model.predict(
+            action, _ = self._model.predict(
                 observation,
-                state=lstm_state,
-                episode_start=episode_start,
                 deterministic=self._evaluation_cfg["deterministic"],
             )
 
-            observation, reward, done, info = (
-    self._environment.step(action)
-)
-
-            terminated = bool(done[0])
-            truncated = False
-            info = info[0]
-            reward = float(reward[0])
-            episode_start = bool(terminated or truncated)
+            observation, reward, terminated, truncated, info = (
+                self._environment.step(action)
+            )
             self._action_history.append(
        {
         "step": int(info["step"]),
@@ -336,7 +291,7 @@ class Evaluator:
         # produces exactly that as weights[0] each step.
         weights = history_df["weights"].apply(lambda w: w[0])
 
-        calculator = VectorBTMetricsCalculator(
+        metrics = VectorBTMetricsCalculator(
             prices=prices,
             weights=weights,
             init_cash=float(config["portfolio"]["initial_capital"]),
@@ -350,10 +305,10 @@ class Evaluator:
         # realized trade P&L (previously hand-tracked via `info["capital"]`
         # deltas); downstream plots/report consume whatever is in these
         # two lists, so point them at the simulated portfolio.
-        self._equity_curve = calculator.equity_curve().tolist()
-        self._trade_returns = calculator.trade_returns().tolist()
+        self._equity_curve = metrics.equity_curve().tolist()
+        self._trade_returns = metrics.trade_returns().tolist()
 
-        calculator.save_json(
+        metrics.save_json(
             self._evaluation_dir / "metrics.json",
         )
 
@@ -395,7 +350,6 @@ class Evaluator:
         logger.success(
             "Analytics generated successfully."
         )
-        return metrics
 
     def evaluate(self) -> None:
         """
@@ -409,13 +363,12 @@ class Evaluator:
         self._run_episode()
 
         self._save_csv_outputs()
-        metrics = self._generate_analytics()
-        
+
+        self._generate_analytics()
 
         logger.success(
             "Evaluation completed successfully."
         )
-        return metrics
 
 
 def main() -> int:
@@ -430,25 +383,13 @@ def main() -> int:
         type=Path,
         help="Path to experiment directory.",
     )
-    parser.add_argument(
-    "--model",
-    type=Path,
-    default=None,
-)
-
-    parser.add_argument(
-    "--vecnormalize",
-    type=Path,
-    default=None,
-)
 
     args = parser.parse_args()
 
     evaluator = Evaluator(
-    experiment_directory=args.experiment,
-    model_path=args.model,
-    vecnormalize_path=args.vecnormalize,
-)
+        experiment_directory=args.experiment,
+    )
+
     evaluator.evaluate()
 
     return 0
